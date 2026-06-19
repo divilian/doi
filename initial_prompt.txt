@@ -1,0 +1,56 @@
+great! now write a new __main__ section, which does the following:
+
+1) presents a menu for the user to choose whether to specify author terms, title terms, or year terms.
+
+2) whichever one they select, they then get a prompt to type it. it will then be added to memory. they are then returned to the menu, where they can see what they've specified so far.
+
+3) another menu option is to perform a DOI lookup based on the search information given thus far. when the user chooses this, call the function you just wrote, and present to the user a numbered list of DOI matches, and give them the option to select one. when they select one, call each of the other three functions, and present that information to the user in a pretty way. the DOI list should then be printed again, and the user returned to the DOI-selection prompt. if they type "q" to this DOI prompt instead of a number, return to the first menu, with their search terms still intact.
+
+4) another menu option is to clear the current search data. this will erase anything the user has previously added to the author, title, and year fields, and return them to the menu.
+
+
+Example usage:
+
+Welcome to the DOI lookup program!
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: t
+title: Still Building
+
+Search data so far:
+title: Still Building
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: a
+author: Butthead
+
+Search data so far:
+title: Still Building
+author: Butthead
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: a
+author: Davies
+
+Search data so far:
+title: Still Building
+author: Butthead
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: l
+Looking up DOIs...
+1. 10.1145/1897816.1897840
+2. 10.1234/may-the-force-be-with-you
+3. 10.1234/so-say-we-all
+
+Choose DOI (or [q]uit): 1
+(...print all the stuff for the Memex paper, including an empty list of ORCID IDs...)
+
+Choose DOI (or [q]uit): q
+Search data so far:
+title: Still Building
+author: Davies
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: c
+
+Search data so far: (none)
+
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: t
+title: The Innate Cussedness of Inanimate Objects
+
+Search data so far:
+title: The Innate Cussedness of Inanimate Objects
+Enter [t]itle, [a]uthor, [y]ear, [l]ookup, [c]lear, or [q]uit: q
+
+(program ends)
