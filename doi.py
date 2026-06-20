@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-doi_play.py
+doi.py
 
 A small CLI helper for finding DOIs and fetching metadata for selected DOIs.
 
@@ -19,12 +19,14 @@ import os
 import re
 import sys
 import unicodedata
+from dotend import load_dotenv
 from pprint import pprint
 from typing import Any
 from urllib.parse import quote
 
 import requests
 
+load_dotenv()
 
 # ---------------------------------------------------------
 # Request helpers
@@ -34,10 +36,13 @@ DEFAULT_TIMEOUT = 20
 
 # Crossref recommends identifying scripts that use its API. Keeping the email
 # configurable makes the script easier to share later.
-CONTACT_EMAIL = os.getenv("DOI_PLAY_EMAIL", "stephenclarkdavies@gmail.com")
+DOI_EMAIL = os.getenv("DOI_EMAIL", "")
 OPENALEX_API_KEY = os.getenv("OPENALEX_API_KEY")
 
-USER_AGENT = f"doi-play/0.1 (mailto:{CONTACT_EMAIL})"
+if CONTACT_EMAIL:
+    USER_AGENT = f"doi/0.1 (mailto:{CONTACT_EMAIL})"
+else:
+    USER_AGENT = "doi/0.1"
 DEFAULT_HEADERS = {
     "User-Agent": USER_AGENT,
 }
