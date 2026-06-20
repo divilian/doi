@@ -20,7 +20,7 @@ import re
 import sys
 import unicodedata
 from dotenv import load_dotenv
-from pprint import pprint
+from pprint import pformat
 from typing import Any
 from urllib.parse import quote
 
@@ -633,6 +633,15 @@ def print_candidates(candidates: list[dict[str, Any]]) -> None:
         output += serialize_candidate(candidate, i) + "\n"
     page_text(output)
 
+def print_dict(d):
+    for k, v in d.items():
+        print(f"  {k}: {pformat(v)}")
+
+def print_list_of_dicts(ld):
+    for i in ld:
+        print_dict(i)
+        print()
+    
 def print_selected_doi_details(doi: str) -> None:
     """Print Crossref metadata, ORCIDs, and BibTeX for a selected DOI."""
     print("\n" + "=" * 60)
@@ -647,7 +656,7 @@ def print_selected_doi_details(doi: str) -> None:
             "it may simply be registered outside Crossref."
         )
     else:
-        pprint(metadata)
+        print_dict(metadata)
     input("(Press Enter.)")
 
     print("\n--- ORCIDs from OpenAlex ---")
@@ -655,7 +664,7 @@ def print_selected_doi_details(doi: str) -> None:
     if not orcids:
         print("[]")
     else:
-        pprint(orcids)
+        print_list_of_dicts(orcids)
     input("(Press Enter.)")
 
     print("\n--- BibTeX from doi.org ---")
