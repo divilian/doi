@@ -17,6 +17,7 @@ from .normalize import (
     looks_like_doi,
     quote_doi_for_doi_org,
     quote_doi_for_path,
+    split_words,
 )
 from .candidates import (
     add_best_candidate_score,

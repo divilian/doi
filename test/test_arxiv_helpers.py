@@ -27,3 +27,10 @@ def test_find_arxiv_id_in_nested_mapping():
 def test_make_arxiv_url():
     assert smeli.make_arxiv_url("2507.11521") == "https://arxiv.org/abs/2507.11521"
     assert smeli.make_arxiv_url(None) == ""
+
+
+def test_arxiv_loose_search_query_uses_normalized_terms():
+    query = smeli.sources.arxiv_loose_search_query("Starnini opinion dynamics")
+    assert 'all:"starnini"' in query
+    assert 'all:"opinion"' in query
+    assert 'all:"dynamics"' in query
