@@ -127,3 +127,38 @@ def test_get_paper_candidates_uses_loose_sources_for_free_form_query(monkeypatch
     assert results[0]["match_note"] == "free-form query"
     assert {name for name, _, _ in calls} == {"openalex", "crossref", "datacite", "arxiv"}
     assert all(query == "starnini opinion dynamics" for _, query, _ in calls)
+
+
+def test_get_paper_candidates_is_quiet_by_default(monkeypatch, capsys):
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_openalex_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_crossref_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_datacite_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
+
+    smeli.get_paper_candidates(author="clemmer", title="smeagol")
+
+    output = capsys.readouterr().out
+    assert output == ""
+
+
+def test_get_paper_candidates_can_report_progress_to_callback(monkeypatch):
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_openalex_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_crossref_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_datacite_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
+    messages = []
+
+    smeli.get_paper_candidates(author="clemmer", title="smeagol", progress=messages.append)
+
+    assert "  OpenAlex..." in messages
+    assert "  Crossref..." in messages
+    assert "  DataCite..." in messages
+    assert "  arXiv..." in messages

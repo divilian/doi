@@ -395,7 +395,7 @@ def _show_lookup_results(
     Return True when at least one candidate was found, otherwise False.
     """
     print("Looking up paper candidates...")
-    results = get_paper_candidates(**search_data)
+    results = get_paper_candidates(**search_data, progress=print)
 
     if not results:
         print("No paper candidates found matching those criteria.")

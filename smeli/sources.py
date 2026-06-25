@@ -34,6 +34,7 @@ __all__ = [
 
 import re
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import quote
 
@@ -70,6 +71,12 @@ from .candidates import (
     merge_candidate_list,
     _openalex_item_to_candidate,
 )
+
+
+def _emit_progress(progress: Callable[[str], None] | None, message: str) -> None:
+    """Send a progress message to a caller-supplied callback, if any."""
+    if progress is not None:
+        progress(message)
 
 
 def get_metadata_from_crossref(doi: str) -> dict[str, Any] | None:
@@ -859,6 +866,8 @@ def get_paper_candidates(
     year: str | int | None = None,
     identifier: str | None = None,
     query: str | None = None,
+    *,
+    progress: Callable[[str], None] | None = None,
 ) -> list[dict[str, Any]]:
     """Search all configured metadata sources and return merged candidates.
 
@@ -870,6 +879,8 @@ Args:
         supplied, identifier resolution takes precedence over fielded search.
     query: Optional free-form bibliographic query. Used when no identifier is
         supplied.
+    progress: Optional callback for source-level progress messages. The CLI
+        passes ``print`` here; ordinary Python API calls are quiet by default.
 
 Returns:
     list[dict[str, Any]]: A score-sorted list of merged Smeli candidate
@@ -877,8 +888,8 @@ Returns:
         collapsed and annotated with ``metadata_sources``.
 
 Notes:
-    This is the highest-level public lookup API. It may print progress messages
-    while it queries sources.
+    This is the highest-level public lookup API. It does not print during
+    ordinary Python API use unless a progress callback is supplied.
 """
     search_variants: list[dict[str, Any]] = [
         {"author": author, "title": title or query, "year": year},
@@ -888,25 +899,25 @@ Notes:
         candidates = get_paper_candidates_from_identifier(identifier)
     elif query:
         candidates = []
-        print("  OpenAlex...")
+        _emit_progress(progress, "  OpenAlex...")
         candidates.extend(_get_paper_candidates_from_openalex_loose(query, year=year))
-        print("  Crossref...")
+        _emit_progress(progress, "  Crossref...")
         candidates.extend(_get_paper_candidates_from_crossref_loose(query, year=year))
-        print("  DataCite...")
+        _emit_progress(progress, "  DataCite...")
         candidates.extend(_get_paper_candidates_from_datacite_loose(query, year=year))
-        print("  arXiv...")
+        _emit_progress(progress, "  arXiv...")
         candidates.extend(_get_paper_candidates_from_arxiv_loose(query, year=year))
         for candidate in candidates:
             candidate["_match_note"] = "free-form query"
     else:
         candidates = []
-        print("  OpenAlex...")
+        _emit_progress(progress, "  OpenAlex...")
         candidates.extend(get_paper_candidates_from_openalex(author=author, title=title, year=year))
-        print("  Crossref...")
+        _emit_progress(progress, "  Crossref...")
         candidates.extend(get_paper_candidates_from_crossref(author=author, title=title, year=year))
-        print("  DataCite...")
+        _emit_progress(progress, "  DataCite...")
         candidates.extend(get_paper_candidates_from_datacite(author=author, title=title, year=year))
-        print("  arXiv...")
+        _emit_progress(progress, "  arXiv...")
         candidates.extend(get_paper_candidates_from_arxiv(author=author, title=title, year=year))
 
         # If title+author matching found nothing, try the most common data-entry
@@ -914,17 +925,17 @@ Notes:
         # the author field. This is cheap and catches searches like
         # title="starnini", author="opinion dynamics".
         if not candidates and title and author:
-            print("  No strict fielded matches. Trying title/author swapped...")
+            _emit_progress(progress, "  No strict fielded matches. Trying title/author swapped...")
             swapped = {"author": title, "title": author, "year": year, "_match_note": "title/author swapped"}
             search_variants.append(swapped)
             swapped_candidates: list[dict[str, Any]] = []
-            print("    OpenAlex...")
+            _emit_progress(progress, "    OpenAlex...")
             swapped_candidates.extend(get_paper_candidates_from_openalex(author=title, title=author, year=year))
-            print("    Crossref...")
+            _emit_progress(progress, "    Crossref...")
             swapped_candidates.extend(get_paper_candidates_from_crossref(author=title, title=author, year=year))
-            print("    DataCite...")
+            _emit_progress(progress, "    DataCite...")
             swapped_candidates.extend(get_paper_candidates_from_datacite(author=title, title=author, year=year))
-            print("    arXiv...")
+            _emit_progress(progress, "    arXiv...")
             swapped_candidates.extend(get_paper_candidates_from_arxiv(author=title, title=author, year=year))
             for candidate in swapped_candidates:
                 candidate["_match_note"] = "title/author swapped"
@@ -936,16 +947,16 @@ Notes:
         if not candidates:
             loose_query = bibliographic_query(author, title, year=None)
             if loose_query:
-                print("  No fielded matches. Trying broad all-fields fallback...")
+                _emit_progress(progress, "  No fielded matches. Trying broad all-fields fallback...")
                 search_variants.append({"author": None, "title": loose_query, "year": year, "_match_note": "broad all-fields fallback"})
                 loose_candidates: list[dict[str, Any]] = []
-                print("    OpenAlex...")
+                _emit_progress(progress, "    OpenAlex...")
                 loose_candidates.extend(_get_paper_candidates_from_openalex_loose(loose_query, year=year))
-                print("    Crossref...")
+                _emit_progress(progress, "    Crossref...")
                 loose_candidates.extend(_get_paper_candidates_from_crossref_loose(loose_query, year=year))
-                print("    DataCite...")
+                _emit_progress(progress, "    DataCite...")
                 loose_candidates.extend(_get_paper_candidates_from_datacite_loose(loose_query, year=year))
-                print("    arXiv...")
+                _emit_progress(progress, "    arXiv...")
                 loose_candidates.extend(_get_paper_candidates_from_arxiv_loose(loose_query, year=year))
                 for candidate in loose_candidates:
                     candidate["_match_note"] = "broad all-fields fallback"
