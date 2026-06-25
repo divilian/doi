@@ -46,10 +46,17 @@ def test_non_private_module_definitions_are_exported():
 
 
 def test_top_level_all_exposes_package_api_without_private_helpers():
-    assert "get_work_candidates" in smeli.__all__
+    assert "get_paper_candidates" in smeli.__all__
     assert "clean_doi" in smeli.__all__
     assert "candidate_to_bibtex" in smeli.__all__
     assert "main" in smeli.__all__
     assert all(not name.startswith("_") for name in smeli.__all__)
     assert "_fetch_json" not in smeli.__all__
     assert "_crossref_item_to_candidate" not in smeli.__all__
+
+
+def test_public_api_uses_paper_terminology_not_work_terminology():
+    assert "get_paper_candidates" in smeli.__all__
+    assert "get_work_candidates" not in smeli.__all__
+    assert all("work_candidates" not in name for name in smeli.__all__)
+    assert not hasattr(smeli, "get_work_candidates")

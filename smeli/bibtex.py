@@ -193,14 +193,14 @@ Args:
 
 Returns:
     A lower-case key in Kurrent/Smeli style, such as ``"davies2011"`` or
-    ``"starnini2025"``. Missing authors fall back to ``"work"`` and missing
+    ``"starnini2025"``. Missing authors fall back to ``"paper"`` and missing
     years fall back to ``"nd"``.
 """
     authors = candidate.get("authors") or []
     if authors:
-        author_part = _author_lastish_name(authors[0]) or "work"
+        author_part = _author_lastish_name(authors[0]) or "paper"
     else:
-        author_part = "work"
+        author_part = "paper"
 
     year = candidate.get("year") or "nd"
     key = f"{author_part}{year}".lower()

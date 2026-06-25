@@ -19,7 +19,7 @@ def starnini_candidate():
     }
 
 
-def test_get_work_candidates_merges_and_sorts_regular_source_results(monkeypatch):
+def test_get_paper_candidates_merges_and_sorts_regular_source_results(monkeypatch):
     calls = []
 
     def fake_openalex(**kwargs):
@@ -38,12 +38,12 @@ def test_get_work_candidates_merges_and_sorts_regular_source_results(monkeypatch
         calls.append(("arxiv", kwargs))
         return []
 
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_openalex", fake_openalex)
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_crossref", fake_crossref)
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_datacite", fake_datacite)
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_arxiv", fake_arxiv)
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", fake_openalex)
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", fake_crossref)
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", fake_datacite)
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", fake_arxiv)
 
-    results = smeli.get_work_candidates(author="starnini", title="opinion dynamics", year=2025)
+    results = smeli.get_paper_candidates(author="starnini", title="opinion dynamics", year=2025)
     assert len(results) == 1
     assert results[0]["doi"] == "10.48550/arXiv.2507.11521"
     assert results[0]["metadata_sources"] == ["OpenAlex", "DataCite"]
@@ -51,7 +51,7 @@ def test_get_work_candidates_merges_and_sorts_regular_source_results(monkeypatch
     assert {name for name, _ in calls} == {"openalex", "crossref", "datacite", "arxiv"}
 
 
-def test_get_work_candidates_tries_swapped_title_author_when_strict_empty(monkeypatch):
+def test_get_paper_candidates_tries_swapped_title_author_when_strict_empty(monkeypatch):
     strict_calls = []
 
     def fake_openalex(**kwargs):
@@ -60,68 +60,68 @@ def test_get_work_candidates_tries_swapped_title_author_when_strict_empty(monkey
             return [starnini_candidate()]
         return []
 
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_openalex", fake_openalex)
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_crossref", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_datacite", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_arxiv", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_openalex_loose", lambda *args, **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_crossref_loose", lambda *args, **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_datacite_loose", lambda *args, **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", fake_openalex)
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_openalex_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_crossref_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_datacite_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
 
-    results = smeli.get_work_candidates(author="opinion dynamics", title="starnini")
+    results = smeli.get_paper_candidates(author="opinion dynamics", title="starnini")
     assert len(results) == 1
     assert results[0]["match_note"] == "title/author swapped"
     assert {"author": "opinion dynamics", "title": "starnini", "year": None} in strict_calls
     assert {"author": "starnini", "title": "opinion dynamics", "year": None} in strict_calls
 
 
-def test_get_work_candidates_tries_loose_fallback_when_fielded_empty(monkeypatch):
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_openalex", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_crossref", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_datacite", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_arxiv", lambda **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_openalex_loose", lambda query, **kwargs: [starnini_candidate()] if query == "starnini opinion dynamics" else [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_crossref_loose", lambda *args, **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_datacite_loose", lambda *args, **kwargs: [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
+def test_get_paper_candidates_tries_loose_fallback_when_fielded_empty(monkeypatch):
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", lambda **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_openalex_loose", lambda query, **kwargs: [starnini_candidate()] if query == "starnini opinion dynamics" else [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_crossref_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_datacite_loose", lambda *args, **kwargs: [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_arxiv_loose", lambda *args, **kwargs: [])
 
-    results = smeli.get_work_candidates(author="opinion dynamics", title="starnini")
+    results = smeli.get_paper_candidates(author="opinion dynamics", title="starnini")
     assert len(results) == 1
     # Swapped fallback is tried before loose fallback, but the loose fallback is
     # the one that returns a candidate in this test.
     assert results[0]["match_note"] == "broad all-fields fallback"
 
 
-def test_get_work_candidates_from_identifier_dispatches_doi_arxiv_orcid_openalex(monkeypatch):
-    monkeypatch.setattr(smeli.sources, "get_candidate_from_doi", lambda value: {"doi": smeli.clean_doi(value), "title": "DOI work"})
-    monkeypatch.setattr(smeli.sources, "get_candidate_from_arxiv_id", lambda value: {"arxiv_id": smeli.base_arxiv_id(value), "title": "arXiv work"})
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_orcid", lambda value: [{"orcid": smeli.extract_orcid(value), "title": "ORCID work"}])
-    monkeypatch.setattr(smeli.sources, "get_candidate_from_openalex_id", lambda value: {"openalex_id": value, "title": "OpenAlex work"})
+def test_get_paper_candidates_from_identifier_dispatches_doi_arxiv_orcid_openalex(monkeypatch):
+    monkeypatch.setattr(smeli.sources, "get_candidate_from_doi", lambda value: {"doi": smeli.clean_doi(value), "title": "DOI paper"})
+    monkeypatch.setattr(smeli.sources, "get_candidate_from_arxiv_id", lambda value: {"arxiv_id": smeli.base_arxiv_id(value), "title": "arXiv paper"})
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_orcid", lambda value: [{"orcid": smeli.extract_orcid(value), "title": "ORCID paper"}])
+    monkeypatch.setattr(smeli.sources, "get_candidate_from_openalex_id", lambda value: {"openalex_id": value, "title": "OpenAlex paper"})
 
-    assert smeli.get_work_candidates_from_identifier("https://doi.org/10.1234/foo")[0]["doi"] == "10.1234/foo"
-    assert smeli.get_work_candidates_from_identifier("https://arxiv.org/abs/2507.11521v1")[0]["arxiv_id"] == "2507.11521"
-    assert smeli.get_work_candidates_from_identifier("https://orcid.org/0000-0002-0254-6627")[0]["orcid"] == "0000-0002-0254-6627"
-    assert smeli.get_work_candidates_from_identifier("W123")[0]["openalex_id"] == "W123"
+    assert smeli.get_paper_candidates_from_identifier("https://doi.org/10.1234/foo")[0]["doi"] == "10.1234/foo"
+    assert smeli.get_paper_candidates_from_identifier("https://arxiv.org/abs/2507.11521v1")[0]["arxiv_id"] == "2507.11521"
+    assert smeli.get_paper_candidates_from_identifier("https://orcid.org/0000-0002-0254-6627")[0]["orcid"] == "0000-0002-0254-6627"
+    assert smeli.get_paper_candidates_from_identifier("W123")[0]["openalex_id"] == "W123"
 
 
-def test_get_work_candidates_uses_loose_sources_for_free_form_query(monkeypatch):
+def test_get_paper_candidates_uses_loose_sources_for_free_form_query(monkeypatch):
     calls = []
 
     def fake_openalex_loose(query, **kwargs):
         calls.append(("openalex", query, kwargs))
         return [starnini_candidate()] if query == "starnini opinion dynamics" else []
 
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_openalex", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict OpenAlex should not be used for query")))
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_crossref", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict Crossref should not be used for query")))
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_datacite", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict DataCite should not be used for query")))
-    monkeypatch.setattr(smeli.sources, "get_work_candidates_from_arxiv", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict arXiv should not be used for query")))
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_openalex_loose", fake_openalex_loose)
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_crossref_loose", lambda query, **kwargs: calls.append(("crossref", query, kwargs)) or [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_datacite_loose", lambda query, **kwargs: calls.append(("datacite", query, kwargs)) or [])
-    monkeypatch.setattr(smeli.sources, "_get_work_candidates_from_arxiv_loose", lambda query, **kwargs: calls.append(("arxiv", query, kwargs)) or [])
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_openalex", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict OpenAlex should not be used for query")))
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_crossref", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict Crossref should not be used for query")))
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_datacite", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict DataCite should not be used for query")))
+    monkeypatch.setattr(smeli.sources, "get_paper_candidates_from_arxiv", lambda **kwargs: (_ for _ in ()).throw(AssertionError("strict arXiv should not be used for query")))
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_openalex_loose", fake_openalex_loose)
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_crossref_loose", lambda query, **kwargs: calls.append(("crossref", query, kwargs)) or [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_datacite_loose", lambda query, **kwargs: calls.append(("datacite", query, kwargs)) or [])
+    monkeypatch.setattr(smeli.sources, "_get_paper_candidates_from_arxiv_loose", lambda query, **kwargs: calls.append(("arxiv", query, kwargs)) or [])
 
-    results = smeli.get_work_candidates(query="starnini opinion dynamics", year=2025)
+    results = smeli.get_paper_candidates(query="starnini opinion dynamics", year=2025)
 
     assert len(results) == 1
     assert results[0]["match_note"] == "free-form query"

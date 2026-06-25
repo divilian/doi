@@ -1,8 +1,8 @@
 # Smeli
 
-**Smeli** is the Scholarly MEtadata Lookup Interface: a DOI-aware metadata lookup library and command-line tool for scholarly works.
+**Smeli** is the Scholarly MEtadata Lookup Interface: a DOI-aware metadata lookup library and command-line tool for scholarly papers.
 
-Smeli can search and normalize metadata from OpenAlex, Crossref, DataCite, arXiv, and doi.org BibTeX content negotiation. DOI is important, but it is not required: DOI-less arXiv and OpenAlex works are valid Smeli candidates.
+Smeli can search and normalize metadata from OpenAlex, Crossref, DataCite, arXiv, and doi.org BibTeX content negotiation. DOI is important, but it is not required: DOI-less arXiv and OpenAlex records are valid Smeli candidates.
 
 ## Two ways to use Smeli
 
@@ -18,9 +18,9 @@ smeli 0000-0002-0254-6627
 Use the Python API when another program wants candidate records, identifier normalization, metadata lookups, or BibTeX generation:
 
 ```python
-from smeli import get_work_candidates, candidate_to_bibtex
+from smeli import get_paper_candidates, candidate_to_bibtex
 
-candidates = get_work_candidates(query="still building the memex davies")
+candidates = get_paper_candidates(query="still building the memex davies")
 for candidate in candidates:
     print(candidate["title"], candidate.get("doi"))
 

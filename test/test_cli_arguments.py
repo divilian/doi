@@ -36,15 +36,15 @@ def test_infer_search_data_extracts_year_from_free_form_query():
 def test_one_shot_identifier_displays_single_match_without_choice(monkeypatch):
     calls = []
 
-    def fake_get_work_candidates(**kwargs):
+    def fake_get_paper_candidates(**kwargs):
         calls.append(kwargs)
         return [{"title": "A Paper", "doi": "10.1126/science.1102081"}]
 
-    def fake_print_selected_work_details(candidate, *, pause_at_end=True):
+    def fake_print_selected_paper_details(candidate, *, pause_at_end=True):
         calls.append({"selected": candidate, "pause_at_end": pause_at_end})
 
-    monkeypatch.setattr(cli, "get_work_candidates", fake_get_work_candidates)
-    monkeypatch.setattr(cli, "_print_selected_work_details", fake_print_selected_work_details)
+    monkeypatch.setattr(cli, "get_paper_candidates", fake_get_paper_candidates)
+    monkeypatch.setattr(cli, "_print_selected_paper_details", fake_print_selected_paper_details)
     monkeypatch.setattr(cli, "_choose_from_results", lambda results, **kwargs: (_ for _ in ()).throw(AssertionError("should not ask user to choose")))
 
     cli._run_one_shot(["10.1126/science.1102081"])
@@ -57,16 +57,16 @@ def test_one_shot_identifier_displays_single_match_without_choice(monkeypatch):
 def test_one_shot_free_form_query_auto_selects_single_match(monkeypatch):
     calls = []
 
-    def fake_get_work_candidates(**kwargs):
+    def fake_get_paper_candidates(**kwargs):
         calls.append(kwargs)
         return [{"title": "Still Building the Memex", "authors": ["Stephen Davies"]}]
 
-    def fake_print_selected_work_details(candidate, *, pause_at_end=True):
+    def fake_print_selected_paper_details(candidate, *, pause_at_end=True):
         calls.append({"selected": candidate, "pause_at_end": pause_at_end})
 
-    monkeypatch.setattr(cli, "get_work_candidates", fake_get_work_candidates)
+    monkeypatch.setattr(cli, "get_paper_candidates", fake_get_paper_candidates)
     monkeypatch.setattr(cli, "_choose_from_results", lambda results, **kwargs: (_ for _ in ()).throw(AssertionError("should not ask user to choose")))
-    monkeypatch.setattr(cli, "_print_selected_work_details", fake_print_selected_work_details)
+    monkeypatch.setattr(cli, "_print_selected_paper_details", fake_print_selected_paper_details)
 
     cli._run_one_shot(["still", "building", "the", "memex", "davies"])
 
@@ -79,13 +79,13 @@ def test_one_shot_free_form_query_auto_selects_single_match(monkeypatch):
 def test_one_shot_list_flag_forces_result_list_for_single_match(monkeypatch):
     calls = []
 
-    def fake_get_work_candidates(**kwargs):
+    def fake_get_paper_candidates(**kwargs):
         calls.append(kwargs)
         return [{"title": "Still Building the Memex", "authors": ["Stephen Davies"]}]
 
-    monkeypatch.setattr(cli, "get_work_candidates", fake_get_work_candidates)
+    monkeypatch.setattr(cli, "get_paper_candidates", fake_get_paper_candidates)
     monkeypatch.setattr(cli, "_choose_from_results", lambda results, **kwargs: calls.append({"results": results, **kwargs}))
-    monkeypatch.setattr(cli, "_print_selected_work_details", lambda candidate, **kwargs: (_ for _ in ()).throw(AssertionError("should not auto-select when --list is used")))
+    monkeypatch.setattr(cli, "_print_selected_paper_details", lambda candidate, **kwargs: (_ for _ in ()).throw(AssertionError("should not auto-select when --list is used")))
 
     cli._run_one_shot(["--list", "still", "building", "the", "memex", "davies"])
 
@@ -101,12 +101,12 @@ def test_infer_search_data_extracts_orcid_identifier():
 
 
 def test_one_shot_no_results_omits_search_data(monkeypatch, capsys):
-    monkeypatch.setattr(cli, "get_work_candidates", lambda **kwargs: [])
+    monkeypatch.setattr(cli, "get_paper_candidates", lambda **kwargs: [])
 
     cli._run_one_shot(["Stephen", "Davies", "University", "of", "Mary", "Washington"])
 
     output = capsys.readouterr().out
-    assert "No work candidates found matching those criteria." in output
+    assert "No paper candidates found matching those criteria." in output
     assert "Search data so far" not in output
 
 

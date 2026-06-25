@@ -1,6 +1,6 @@
 # Candidate Records
 
-A **candidate** is Smeli's normal dictionary representation for a scholarly work. A candidate may describe a journal article, conference paper, arXiv preprint, dataset, software record, repository item, or another scholarly output.
+A **candidate** is Smeli's normal dictionary representation for a scholarly paper or paper-like output. A candidate may describe a journal article, conference paper, arXiv preprint, dataset, software record, repository item, or another scholarly output.
 
 Smeli deliberately uses dictionaries rather than a custom class for now because source APIs vary and the command-line tool benefits from flexible partial records.
 
@@ -8,15 +8,15 @@ Smeli deliberately uses dictionaries rather than a custom class for now because 
 
 | Key | Type | Meaning |
 | --- | --- | --- |
-| `title` | `str` | Work title, when known. |
+| `title` | `str` | Paper title, when known. |
 | `authors` | `list[str]` | Author display names. |
 | `year` | `int | str | None` | Publication year, when known. |
 | `venue` | `str` | Journal, conference, arXiv, or container/source name. |
 | `publisher` | `str` | Publisher or host organization. |
-| `type` | `str` | Source-specific work type. |
+| `type` | `str` | Source-specific publication/resource type. |
 | `doi` | `str | None` | Normalized bare DOI, or `None`. |
 | `arxiv_id` | `str | None` | Bare arXiv ID without version suffix where possible. |
-| `openalex_id` | `str` | OpenAlex work URL/ID when available. |
+| `openalex_id` | `str` | OpenAlex Work URL/ID when available. |
 | `url` | `str` | Best landing URL known to Smeli. |
 | `cited_by_count` | `int` | Citation count from the source, usually OpenAlex or Crossref. |
 | `metadata_sources` | `list[str]` | Sources that contributed metadata to the merged candidate. |
@@ -32,7 +32,7 @@ Call `canonical_candidate()` when you have a partial record and want Smeli's def
 from smeli import canonical_candidate
 
 candidate = canonical_candidate({
-    "title": "Example Work",
+    "title": "Example Paper",
     "doi": "https://doi.org/10.1234/example",
     "source": "ExampleSource",
 })
@@ -42,7 +42,7 @@ Canonicalization copies the input dictionary, normalizes DOI/arXiv identifiers, 
 
 ## Merging
 
-Source APIs often describe the same work slightly differently. Use `merge_candidate_list()` to collapse likely duplicates across source results:
+Source APIs often describe the same paper slightly differently. Use `merge_candidate_list()` to collapse likely duplicates across source results:
 
 ```python
 from smeli import merge_candidate_list

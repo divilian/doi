@@ -17,16 +17,16 @@ __all__ = [
     "get_bibtex_from_doi",
     "get_orcids_from_openalex",
     "get_orcids_from_crossref",
-    "get_work_candidates_from_crossref",
-    "get_work_candidates_from_openalex",
-    "get_work_candidates_from_datacite",
-    "get_work_candidates_from_arxiv",
+    "get_paper_candidates_from_crossref",
+    "get_paper_candidates_from_openalex",
+    "get_paper_candidates_from_datacite",
+    "get_paper_candidates_from_arxiv",
     "get_candidate_from_openalex_id",
     "get_candidate_from_arxiv_id",
     "get_candidate_from_doi",
-    "get_work_candidates_from_orcid",
-    "get_work_candidates_from_identifier",
-    "get_work_candidates",
+    "get_paper_candidates_from_orcid",
+    "get_paper_candidates_from_identifier",
+    "get_paper_candidates",
     "get_doi_from_crossref",
     "get_doi_from_openalex",
 ]
@@ -194,7 +194,7 @@ def get_bibtex_from_doi(doi: str) -> str | None:
 
     Notes:
         This goes through the DOI resolver rather than Crossref directly, so it
-        may work for DOIs outside Crossref's registry.
+        may succeed for DOIs outside Crossref's registry.
     """
     doi = clean_doi(doi)
     if not doi:
@@ -212,7 +212,7 @@ Args:
 
 Returns:
     A list of dictionaries with ``name`` and ``orcid`` keys. Returns an empty
-    list when OpenAlex has no ORCID data for the work.
+    list when OpenAlex has no ORCID data for the paper.
 """
     doi = clean_doi(doi)
     if not doi:
@@ -246,7 +246,7 @@ def get_orcids_from_crossref(doi: str) -> list[dict[str, str]]:
 
     Returns:
         A list of dictionaries with ``name`` and ``orcid`` keys. Returns an
-        empty list when Crossref has no ORCID data for the work.
+        empty list when Crossref has no ORCID data for the paper.
 
     Notes:
         Crossref ORCID coverage depends on what the publisher supplied.
@@ -271,12 +271,12 @@ def get_orcids_from_crossref(doi: str) -> list[dict[str, str]]:
 
     return orcids
 
-def get_work_candidates_from_crossref(
+def get_paper_candidates_from_crossref(
     author: str | None = None,
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Fetch work candidates from Crossref bibliographic search.
+    """Fetch paper candidates from Crossref bibliographic search.
 
 Args:
     author: Optional author name or fragment.
@@ -317,12 +317,12 @@ Returns:
 
     return matched
 
-def get_work_candidates_from_openalex(
+def get_paper_candidates_from_openalex(
     author: str | None = None,
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Fetch work candidates from OpenAlex.
+    """Fetch paper candidates from OpenAlex.
 
     Args:
         author: Optional author name or fragment.
@@ -334,7 +334,7 @@ def get_work_candidates_from_openalex(
         matching.
 
     Notes:
-        DOI-less OpenAlex works are deliberately retained.
+        DOI-less OpenAlex records are deliberately retained.
     """
     url = "https://api.openalex.org/works"
 
@@ -376,12 +376,12 @@ def get_work_candidates_from_openalex(
 
     return matched
 
-def get_work_candidates_from_datacite(
+def get_paper_candidates_from_datacite(
     author: str | None = None,
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Fetch work candidates from DataCite metadata search.
+    """Fetch paper candidates from DataCite metadata search.
 
 Args:
     author: Optional author name or fragment.
@@ -435,12 +435,12 @@ def _arxiv_search_query(author: str | None, title: str | None, year: str | int |
     # robust for this small interactive script.
     return " AND ".join(terms)
 
-def get_work_candidates_from_arxiv(
+def get_paper_candidates_from_arxiv(
     author: str | None = None,
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Fetch work candidates from the arXiv Atom API.
+    """Fetch paper candidates from the arXiv Atom API.
 
 Args:
     author: Optional author name or fragment.
@@ -485,15 +485,15 @@ Returns:
     return matched
 
 def get_candidate_from_openalex_id(openalex_id: str) -> dict[str, Any] | None:
-    """Fetch a single candidate by OpenAlex work ID or URL.
+    """Fetch a single candidate by OpenAlex Work ID or URL.
 
 Args:
-    openalex_id: An OpenAlex work ID such as ``"W2741809807"`` or a full
-        ``openalex.org`` work URL.
+    openalex_id: An OpenAlex Work ID such as ``"W2741809807"`` or a full
+        ``openalex.org`` Work URL.
 
 Returns:
-    A Smeli candidate dictionary, or ``None`` when the work cannot be fetched or
-    converted.
+    A Smeli candidate dictionary, or ``None`` when the OpenAlex record cannot be
+    fetched or converted.
 """
     value = openalex_id.strip()
     if not value:
@@ -618,7 +618,7 @@ Returns:
     merged = merge_candidate_list(candidates)
     return merged[0] if merged else None
 
-def _get_work_candidates_from_openalex_loose(
+def _get_paper_candidates_from_openalex_loose(
     query: str,
     *,
     year: str | int | None = None,
@@ -656,7 +656,7 @@ def _get_work_candidates_from_openalex_loose(
 
     return matched
 
-def _get_work_candidates_from_crossref_loose(
+def _get_paper_candidates_from_crossref_loose(
     query: str,
     *,
     year: str | int | None = None,
@@ -688,7 +688,7 @@ def _get_work_candidates_from_crossref_loose(
 
     return matched
 
-def _get_work_candidates_from_datacite_loose(
+def _get_paper_candidates_from_datacite_loose(
     query: str,
     *,
     year: str | int | None = None,
@@ -727,7 +727,7 @@ def _arxiv_loose_search_query(query: str) -> str:
         return "all:*"
     return " AND ".join(f'all:"{term}"' for term in terms)
 
-def _get_work_candidates_from_arxiv_loose(
+def _get_paper_candidates_from_arxiv_loose(
     query: str,
     *,
     year: str | int | None = None,
@@ -767,8 +767,8 @@ def _get_work_candidates_from_arxiv_loose(
 
     return matched
 
-def get_work_candidates_from_orcid(orcid: str) -> list[dict[str, Any]]:
-    """Fetch work candidates for an author ORCID using OpenAlex.
+def get_paper_candidates_from_orcid(orcid: str) -> list[dict[str, Any]]:
+    """Fetch paper candidates for an author ORCID using OpenAlex.
 
 Args:
     orcid: A bare ORCID iD or ORCID URL.
@@ -778,8 +778,8 @@ Returns:
     descending before later Smeli ranking/merging.
 
 Notes:
-    ORCID identifies a person, not a work, so this function returns a list of
-    works. OpenAlex may return no works for a valid ORCID when its author-work
+    ORCID identifies a person, not a paper, so this function returns a list of
+    papers. OpenAlex may return no papers for a valid ORCID when its author
     links lack that ORCID.
 """
     bare_orcid = extract_orcid(orcid)
@@ -789,7 +789,7 @@ Notes:
     url = "https://api.openalex.org/works"
     params: dict[str, Any] = {
         "per-page": _MAX_CANDIDATES_PER_SOURCE,
-        # OpenAlex works support filtering on the ORCID field nested inside
+        # OpenAlex Works support filtering on the ORCID field nested inside
         # authorships.author. Use the bare ORCID here; using the canonical
         # https://orcid.org/... URL in an author-id filter can produce a 400.
         "filter": f"authorships.author.orcid:{bare_orcid}",
@@ -812,16 +812,16 @@ Notes:
 
     return matched
 
-def get_work_candidates_from_identifier(identifier: str) -> list[dict[str, Any]]:
-    """Resolve a DOI, arXiv ID/URL, ORCID, or OpenAlex work ID/URL.
+def get_paper_candidates_from_identifier(identifier: str) -> list[dict[str, Any]]:
+    """Resolve a DOI, arXiv ID/URL, ORCID, or OpenAlex Work ID/URL.
 
 Args:
     identifier: A scholarly identifier or resolver URL.
 
 Returns:
-    A list of Smeli candidate dictionaries. Work identifiers usually return
+    A list of Smeli candidate dictionaries. Paper identifiers usually return
     zero or one candidate. ORCID identifiers may return many candidates because
-    they identify an author/person rather than a work.
+    they identify an author/person rather than a paper.
 """
     identifier = identifier.strip()
     if not identifier:
@@ -837,16 +837,16 @@ Returns:
         return [candidate] if candidate else []
 
     if looks_like_orcid(identifier):
-        return get_work_candidates_from_orcid(identifier)
+        return get_paper_candidates_from_orcid(identifier)
 
     if "openalex.org/" in identifier.lower() or re.fullmatch(r"W\d+", identifier.strip(), re.IGNORECASE):
         candidate = get_candidate_from_openalex_id(identifier)
         return [candidate] if candidate else []
 
-    print("Identifier did not look like a DOI, arXiv ID/URL, ORCID or OpenAlex work ID/URL.")
+    print("Identifier did not look like a DOI, arXiv ID/URL, ORCID or OpenAlex Work ID/URL.")
     return []
 
-def get_work_candidates(
+def get_paper_candidates(
     author: str | None = None,
     title: str | None = None,
     year: str | int | None = None,
@@ -859,13 +859,13 @@ Args:
     author: Optional author name or fragment for fielded search.
     title: Optional title or title fragment for fielded search.
     year: Optional publication year for filtering/scoring.
-    identifier: Optional DOI, arXiv ID/URL, ORCID, or OpenAlex work ID/URL. When
+    identifier: Optional DOI, arXiv ID/URL, ORCID, or OpenAlex Work ID/URL. When
         supplied, identifier resolution takes precedence over fielded search.
     query: Optional free-form bibliographic query. Used when no identifier is
         supplied.
 
 Returns:
-    A score-sorted list of merged Smeli candidate dictionaries. Duplicate work
+    A score-sorted list of merged Smeli candidate dictionaries. Duplicate paper
     records from multiple sources are collapsed and annotated with
     ``metadata_sources``.
 
@@ -878,29 +878,29 @@ Notes:
     ]
 
     if identifier:
-        candidates = get_work_candidates_from_identifier(identifier)
+        candidates = get_paper_candidates_from_identifier(identifier)
     elif query:
         candidates = []
         print("  OpenAlex...")
-        candidates.extend(_get_work_candidates_from_openalex_loose(query, year=year))
+        candidates.extend(_get_paper_candidates_from_openalex_loose(query, year=year))
         print("  Crossref...")
-        candidates.extend(_get_work_candidates_from_crossref_loose(query, year=year))
+        candidates.extend(_get_paper_candidates_from_crossref_loose(query, year=year))
         print("  DataCite...")
-        candidates.extend(_get_work_candidates_from_datacite_loose(query, year=year))
+        candidates.extend(_get_paper_candidates_from_datacite_loose(query, year=year))
         print("  arXiv...")
-        candidates.extend(_get_work_candidates_from_arxiv_loose(query, year=year))
+        candidates.extend(_get_paper_candidates_from_arxiv_loose(query, year=year))
         for candidate in candidates:
             candidate["_match_note"] = "free-form query"
     else:
         candidates = []
         print("  OpenAlex...")
-        candidates.extend(get_work_candidates_from_openalex(author=author, title=title, year=year))
+        candidates.extend(get_paper_candidates_from_openalex(author=author, title=title, year=year))
         print("  Crossref...")
-        candidates.extend(get_work_candidates_from_crossref(author=author, title=title, year=year))
+        candidates.extend(get_paper_candidates_from_crossref(author=author, title=title, year=year))
         print("  DataCite...")
-        candidates.extend(get_work_candidates_from_datacite(author=author, title=title, year=year))
+        candidates.extend(get_paper_candidates_from_datacite(author=author, title=title, year=year))
         print("  arXiv...")
-        candidates.extend(get_work_candidates_from_arxiv(author=author, title=title, year=year))
+        candidates.extend(get_paper_candidates_from_arxiv(author=author, title=title, year=year))
 
         # If title+author matching found nothing, try the most common data-entry
         # mistake: the user put the author in the title field and title words in
@@ -912,13 +912,13 @@ Notes:
             search_variants.append(swapped)
             swapped_candidates: list[dict[str, Any]] = []
             print("    OpenAlex...")
-            swapped_candidates.extend(get_work_candidates_from_openalex(author=title, title=author, year=year))
+            swapped_candidates.extend(get_paper_candidates_from_openalex(author=title, title=author, year=year))
             print("    Crossref...")
-            swapped_candidates.extend(get_work_candidates_from_crossref(author=title, title=author, year=year))
+            swapped_candidates.extend(get_paper_candidates_from_crossref(author=title, title=author, year=year))
             print("    DataCite...")
-            swapped_candidates.extend(get_work_candidates_from_datacite(author=title, title=author, year=year))
+            swapped_candidates.extend(get_paper_candidates_from_datacite(author=title, title=author, year=year))
             print("    arXiv...")
-            swapped_candidates.extend(get_work_candidates_from_arxiv(author=title, title=author, year=year))
+            swapped_candidates.extend(get_paper_candidates_from_arxiv(author=title, title=author, year=year))
             for candidate in swapped_candidates:
                 candidate["_match_note"] = "title/author swapped"
             candidates.extend(swapped_candidates)
@@ -933,13 +933,13 @@ Notes:
                 search_variants.append({"author": None, "title": loose_query, "year": year, "_match_note": "broad all-fields fallback"})
                 loose_candidates: list[dict[str, Any]] = []
                 print("    OpenAlex...")
-                loose_candidates.extend(_get_work_candidates_from_openalex_loose(loose_query, year=year))
+                loose_candidates.extend(_get_paper_candidates_from_openalex_loose(loose_query, year=year))
                 print("    Crossref...")
-                loose_candidates.extend(_get_work_candidates_from_crossref_loose(loose_query, year=year))
+                loose_candidates.extend(_get_paper_candidates_from_crossref_loose(loose_query, year=year))
                 print("    DataCite...")
-                loose_candidates.extend(_get_work_candidates_from_datacite_loose(loose_query, year=year))
+                loose_candidates.extend(_get_paper_candidates_from_datacite_loose(loose_query, year=year))
                 print("    arXiv...")
-                loose_candidates.extend(_get_work_candidates_from_arxiv_loose(loose_query, year=year))
+                loose_candidates.extend(_get_paper_candidates_from_arxiv_loose(loose_query, year=year))
                 for candidate in loose_candidates:
                     candidate["_match_note"] = "broad all-fields fallback"
                 candidates.extend(loose_candidates)
@@ -959,7 +959,7 @@ def get_doi_from_crossref(
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Return Crossref work candidates that have DOIs.
+    """Return Crossref paper candidates that have DOIs.
 
 Args:
     author: Optional author name or fragment.
@@ -971,12 +971,12 @@ Returns:
 
 Notes:
     This is a compatibility/convenience helper from Smeli's DOI-focused origins.
-    New code usually wants :func:`get_work_candidates_from_crossref` or
-    :func:`get_work_candidates` instead.
+    New code usually wants :func:`get_paper_candidates_from_crossref` or
+    :func:`get_paper_candidates` instead.
 """
     return [
         candidate
-        for candidate in get_work_candidates_from_crossref(author=author, title=title, year=year)
+        for candidate in get_paper_candidates_from_crossref(author=author, title=title, year=year)
         if candidate.get("doi")
     ]
 
@@ -985,7 +985,7 @@ def get_doi_from_openalex(
     title: str | None = None,
     year: str | int | None = None,
 ) -> list[dict[str, Any]]:
-    """Return OpenAlex work candidates that have DOIs.
+    """Return OpenAlex paper candidates that have DOIs.
 
 Args:
     author: Optional author name or fragment.
@@ -997,11 +997,11 @@ Returns:
 
 Notes:
     This is a compatibility/convenience helper from Smeli's DOI-focused origins.
-    New code usually wants :func:`get_work_candidates_from_openalex` or
-    :func:`get_work_candidates` instead.
+    New code usually wants :func:`get_paper_candidates_from_openalex` or
+    :func:`get_paper_candidates` instead.
 """
     return [
         candidate
-        for candidate in get_work_candidates_from_openalex(author=author, title=title, year=year)
+        for candidate in get_paper_candidates_from_openalex(author=author, title=title, year=year)
         if candidate.get("doi")
     ]

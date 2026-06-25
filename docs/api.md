@@ -5,7 +5,7 @@ Smeli's public API is defined by each module's `__all__` list. Names not include
 The top-level package re-exports the public library API, so this is the normal import style:
 
 ```python
-from smeli import get_work_candidates, clean_doi, candidate_to_bibtex
+from smeli import get_paper_candidates, clean_doi, candidate_to_bibtex
 ```
 
 You can also import from specific modules when that makes the code clearer:
@@ -27,30 +27,30 @@ from smeli.normalize import extract_orcid
 
 ## Recommended entrypoints
 
-Most package users should start with `get_work_candidates()`:
+Most package users should start with `get_paper_candidates()`:
 
 ```python
-from smeli import get_work_candidates
+from smeli import get_paper_candidates
 
-candidates = get_work_candidates(query="opinion dynamics starnini")
+candidates = get_paper_candidates(query="opinion dynamics starnini")
 ```
 
-Use `get_work_candidates_from_identifier()` when the user supplied a DOI, arXiv ID, OpenAlex work ID, or ORCID:
+Use `get_paper_candidates_from_identifier()` when the user supplied a DOI, arXiv ID, OpenAlex Work ID, or ORCID:
 
 ```python
-from smeli import get_work_candidates_from_identifier
+from smeli import get_paper_candidates_from_identifier
 
-works = get_work_candidates_from_identifier("0000-0002-0254-6627")
+papers = get_paper_candidates_from_identifier("0000-0002-0254-6627")
 ```
 
-Use `get_candidate_from_doi()`, `get_candidate_from_arxiv_id()`, or `get_candidate_from_openalex_id()` when your code already knows it is resolving a specific work identifier.
+Use `get_candidate_from_doi()`, `get_candidate_from_arxiv_id()`, or `get_candidate_from_openalex_id()` when your code already knows it is resolving a specific paper identifier.
 
 ## Return conventions
 
 Smeli uses simple Python data structures:
 
 - candidate lookups return `list[dict[str, Any]]`
-- single-work lookups return `dict[str, Any] | None`
+- single-paper lookups return `dict[str, Any] | None`
 - metadata lookups return `dict[str, Any] | None`
 - ORCID helpers return `list[dict[str, str]]`
 - BibTeX lookup returns `str | None`

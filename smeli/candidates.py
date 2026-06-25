@@ -1,8 +1,8 @@
 """Candidate conversion, scoring, and merging helpers.
 
-A *candidate* is Smeli's normal work-record dictionary. It may represent a
+A *candidate* is Smeli's normal paper-record dictionary. It may represent a
 journal article, conference paper, arXiv preprint, dataset, software record, or
-other scholarly work. Common keys include ``title``, ``authors``, ``year``,
+another scholarly output. Common keys include ``title``, ``authors``, ``year``,
 ``venue``, ``publisher``, ``doi``, ``arxiv_id``, ``openalex_id``, ``url``,
 ``cited_by_count``, ``metadata_sources``, ``score``, and ``citation_score``.
 
@@ -130,7 +130,7 @@ Notes:
     return candidate
 
 def _crossref_item_to_candidate(item: dict[str, Any]) -> dict[str, Any] | None:
-    """Convert a Crossref result item into a work candidate dictionary."""
+    """Convert a Crossref result item into a paper candidate dictionary."""
     title = _first(item.get("title"), "")
     doi = clean_doi(item.get("DOI"))
     if not title and not doi:
@@ -154,7 +154,7 @@ def _crossref_item_to_candidate(item: dict[str, Any]) -> dict[str, Any] | None:
     return canonical_candidate(candidate)
 
 def _best_openalex_url(item: dict[str, Any]) -> str:
-    """Return the best human landing URL in an OpenAlex work record."""
+    """Return the best human landing URL in an OpenAlex paper record."""
     primary_location = item.get("primary_location") or {}
     landing = primary_location.get("landing_page_url") or ""
     if landing:
@@ -173,7 +173,7 @@ def _best_openalex_url(item: dict[str, Any]) -> str:
     return item.get("id", "") or ""
 
 def _openalex_item_to_candidate(item: dict[str, Any]) -> dict[str, Any] | None:
-    """Convert an OpenAlex work item into a work candidate dictionary."""
+    """Convert an OpenAlex Work item into a paper candidate dictionary."""
     ids = item.get("ids") or {}
     doi = clean_doi(item.get("doi") or ids.get("doi"))
 
@@ -204,7 +204,7 @@ def _openalex_item_to_candidate(item: dict[str, Any]) -> dict[str, Any] | None:
     return canonical_candidate(candidate)
 
 def _datacite_record_to_candidate(record: dict[str, Any]) -> dict[str, Any] | None:
-    """Convert a DataCite DOI record into a work candidate dictionary."""
+    """Convert a DataCite DOI record into a paper candidate dictionary."""
     attributes = record.get("attributes") or {}
     doi = clean_doi(attributes.get("doi") or record.get("id"))
     title = _get_title_from_datacite(attributes)
@@ -230,7 +230,7 @@ def _datacite_record_to_candidate(record: dict[str, Any]) -> dict[str, Any] | No
     return canonical_candidate(candidate)
 
 def _arxiv_entry_to_candidate(entry: ET.Element) -> dict[str, Any] | None:
-    """Convert an arXiv Atom feed entry into a work candidate dictionary."""
+    """Convert an arXiv Atom feed entry into a paper candidate dictionary."""
     ns = {
         "atom": "http://www.w3.org/2005/Atom",
         "arxiv": "http://arxiv.org/schemas/atom",
@@ -285,7 +285,7 @@ def _candidate_matches(
     year: str | int | None = None,
     allow_loose_title: bool = False,
 ) -> bool:
-    """Apply local matching to a structured work candidate."""
+    """Apply local matching to a structured paper candidate."""
     if title:
         if allow_loose_title:
             query_words = _split_words(title)
@@ -356,7 +356,7 @@ def candidate_score(
     title: str | None = None,
     year: str | int | None = None,
 ) -> tuple[int, int]:
-    """Return a local relevance score for a work candidate.
+    """Return a local relevance score for a paper candidate.
 
     Args:
         candidate: A Smeli candidate dictionary.
@@ -422,7 +422,7 @@ def candidate_score(
         score += 30
 
     # Identifier bonuses are deliberately small. A DOI is useful, but DOI-less
-    # works should still be visible and selectable.
+    # DOI-less papers should still be visible and selectable.
     if candidate.get("doi"):
         score += 10
     if candidate.get("arxiv_id"):
@@ -500,7 +500,7 @@ def _add_best_candidate_score(
     return candidate
 
 def candidates_are_same(a: dict[str, Any], b: dict[str, Any]) -> bool:
-    """Return whether two candidates appear to describe the same work.
+    """Return whether two candidates appear to describe the same paper.
 
 Args:
     a: First Smeli candidate dictionary.
@@ -542,7 +542,7 @@ Returns:
     return True
 
 def merge_candidates(primary: dict[str, Any], secondary: dict[str, Any]) -> dict[str, Any]:
-    """Merge two candidate dictionaries describing the same work.
+    """Merge two candidate dictionaries describing the same paper.
 
 Args:
     primary: The preferred candidate record. Existing values are generally kept.

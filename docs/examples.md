@@ -13,9 +13,9 @@ print(extract_orcid("https://orcid.org/0000-0002-0254-6627"))
 ## Search by free-form bibliographic query
 
 ```python
-from smeli import get_work_candidates
+from smeli import get_paper_candidates
 
-candidates = get_work_candidates(query="still building the memex davies")
+candidates = get_paper_candidates(query="still building the memex davies")
 
 for candidate in candidates[:5]:
     print(candidate["score"], candidate["title"], candidate.get("doi"))
@@ -24,41 +24,41 @@ for candidate in candidates[:5]:
 ## Search by fielded metadata
 
 ```python
-from smeli import get_work_candidates
+from smeli import get_paper_candidates
 
-candidates = get_work_candidates(
+candidates = get_paper_candidates(
     title="Still building the memex",
     author="Davies",
     year=2011,
 )
 ```
 
-## Resolve a work identifier
+## Resolve a paper identifier
 
 ```python
-from smeli import get_work_candidates_from_identifier
+from smeli import get_paper_candidates_from_identifier
 
-works = get_work_candidates_from_identifier("10.1126/science.1102081")
+papers = get_paper_candidates_from_identifier("10.1126/science.1102081")
 ```
 
 ## Resolve an ORCID
 
-ORCID identifies a person, not a work, so Smeli returns a list of works:
+ORCID identifies a person, not a paper, so Smeli returns a list of papers:
 
 ```python
-from smeli import get_work_candidates_from_identifier
+from smeli import get_paper_candidates_from_identifier
 
-works = get_work_candidates_from_identifier("0000-0002-0254-6627")
-for work in works:
-    print(work.get("year"), work.get("title"))
+papers = get_paper_candidates_from_identifier("0000-0002-0254-6627")
+for paper in papers:
+    print(paper.get("year"), paper.get("title"))
 ```
 
 ## Generate fallback BibTeX
 
 ```python
-from smeli import candidate_to_bibtex, get_work_candidates
+from smeli import candidate_to_bibtex, get_paper_candidates
 
-candidates = get_work_candidates(query="still building the memex davies")
+candidates = get_paper_candidates(query="still building the memex davies")
 if candidates:
     print(candidate_to_bibtex(candidates[0]))
 ```

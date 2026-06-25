@@ -27,7 +27,7 @@ from .sources import (
     get_bibtex_from_doi,
     get_candidate_from_doi,
     get_orcids_from_openalex,
-    get_work_candidates,
+    get_paper_candidates,
 )
 
 
@@ -128,7 +128,7 @@ def _serialize_candidate(
     candidate: dict[str, Any],
     index: int | None = None,
 ) -> str:
-    """Return one structured work candidate."""
+    """Return one structured paper candidate."""
     prefix = f"{index}. " if index is not None else ""
     title = candidate.get("title") or "[No title]"
     year = candidate.get("year") or "n.d."
@@ -161,7 +161,7 @@ def _serialize_candidate(
     return retval
 
 def _print_candidates(candidates: list[dict[str, Any]]) -> None:
-    """Print numbered work candidates."""
+    """Print numbered paper candidates."""
     output = ""
     for i, candidate in enumerate(candidates[:_MAX_DISPLAY_CANDIDATES], 1):
         output += _serialize_candidate(candidate, i) + "\n"
@@ -180,7 +180,7 @@ def _print_list_of_dicts(ld: list[dict[str, Any]]) -> None:
         _print_dict(i)
         print()
 
-def _print_selected_work_metadata(candidate: dict[str, Any]) -> None:
+def _print_selected_paper_metadata(candidate: dict[str, Any]) -> None:
     """Print the metadata already present on a selected candidate."""
     print("\n--- Candidate metadata ---")
     _print_dict({
@@ -198,18 +198,18 @@ def _print_selected_work_metadata(candidate: dict[str, Any]) -> None:
         "url": candidate.get("url", ""),
     })
 
-def _print_selected_work_details(
+def _print_selected_paper_details(
     candidate: dict[str, Any],
     *,
     pause_at_end: bool = True,
 ) -> None:
-    """Print structured metadata, identifiers, and BibTeX for a selected work."""
-    title = candidate.get("title") or candidate.get("doi") or candidate.get("arxiv_id") or "Selected work"
+    """Print structured metadata, identifiers, and BibTeX for a selected paper."""
+    title = candidate.get("title") or candidate.get("doi") or candidate.get("arxiv_id") or "Selected paper"
     print("\n" + "=" * 60)
     print(_color_title(title))
     print("=" * 60)
 
-    _print_selected_work_metadata(candidate)
+    _print_selected_paper_metadata(candidate)
     input("(Press Enter.)")
 
     doi = candidate.get("doi")
@@ -248,7 +248,7 @@ def _print_selected_work_details(
                 input("(Press Enter to continue.)")
     else:
         print("\n--- DOI-specific enrichment skipped ---")
-        print("This selected work does not currently have a DOI in the merged metadata.")
+        print("This selected paper does not currently have a DOI in the merged metadata.")
         input("(Press Enter.)")
 
     if not used_doi_org_bibtex:
@@ -263,7 +263,7 @@ def _print_selected_work_details(
 def _print_selected_doi_details(doi: str) -> None:
     """Print details for a selected DOI."""
     candidate = get_candidate_from_doi(doi) or canonical_candidate({"doi": doi, "source": "user-supplied DOI"})
-    _print_selected_work_details(candidate)
+    _print_selected_paper_details(candidate)
 
 def _extract_doi_from_text(text: str) -> str | None:
     """Extract a DOI from arbitrary command-line text, if one is present."""
@@ -278,7 +278,7 @@ def _extract_doi_from_text(text: str) -> str | None:
 
 
 def _extract_openalex_id_from_text(text: str) -> str | None:
-    """Extract an OpenAlex work ID or URL from arbitrary text, if present."""
+    """Extract an OpenAlex Work ID or URL from arbitrary text, if present."""
     match = re.search(r"https?://openalex\.org/(?:works/)?(W\d+)", text, flags=re.IGNORECASE)
     if match:
         return match.group(1)
@@ -302,7 +302,7 @@ def _infer_search_data_from_text(text: str) -> dict[str, str | None]:
     Infer a smeli search from arbitrary command-line text.
 
     Identifiers win because DOI, arXiv, and OpenAlex IDs are intended to name a
-    specific work. Otherwise the text is treated as a broad bibliographic query,
+    specific paper. Otherwise the text is treated as a broad bibliographic query,
     with a standalone four-digit year extracted when present.
     """
     text = text.strip()
@@ -346,7 +346,7 @@ def _print_result_counts(results: list[dict[str, Any]]) -> None:
     doi_count = sum(1 for result in results if result.get("doi"))
     arxiv_count = sum(1 for result in results if result.get("arxiv_id"))
     print(
-        f"Found {len(results)} candidate work(s): "
+        f"Found {len(results)} candidate paper(s): "
         f"{doi_count} with DOI, {arxiv_count} with arXiv ID."
     )
 
@@ -361,15 +361,15 @@ def _choose_from_results(
         print()
         _print_candidates(results)
 
-        work_choice = input(
-            "Choose work number (or [q]uit): "
+        paper_choice = input(
+            "Choose paper number (or [q]uit): "
         ).strip().lower()
 
-        if work_choice == "q":
+        if paper_choice == "q":
             return
 
         try:
-            idx = int(work_choice) - 1
+            idx = int(paper_choice) - 1
         except ValueError:
             print("Please enter a valid number or 'q'.")
             continue
@@ -379,7 +379,7 @@ def _choose_from_results(
             continue
 
         selected = results[idx]
-        _print_selected_work_details(selected, pause_at_end=pause_at_end)
+        _print_selected_paper_details(selected, pause_at_end=pause_at_end)
 
 
 def _show_lookup_results(
@@ -394,21 +394,21 @@ def _show_lookup_results(
 
     Return True when at least one candidate was found, otherwise False.
     """
-    print("Looking up work candidates...")
-    results = get_work_candidates(**search_data)
+    print("Looking up paper candidates...")
+    results = get_paper_candidates(**search_data)
 
     if not results:
-        print("No work candidates found matching those criteria.")
+        print("No paper candidates found matching those criteria.")
         if show_search_data_on_no_results:
             _print_search_data(search_data)
         return False
 
     if not force_list and len(results) == 1:
         if direct_identifier:
-            print("Found one work for that identifier.")
+            print("Found one paper for that identifier.")
         else:
-            print("Found one candidate work.")
-        _print_selected_work_details(results[0], pause_at_end=pause_at_end)
+            print("Found one candidate paper.")
+        _print_selected_paper_details(results[0], pause_at_end=pause_at_end)
         return True
 
     _print_result_counts(results)
