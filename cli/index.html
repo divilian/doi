@@ -50,6 +50,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -666,10 +668,23 @@
 <p>Run the interactive menu with:</p>
 <div class="highlight"><pre><span></span><code>smeli
 </code></pre></div>
+<p>Show command-line usage with:</p>
+<div class="highlight"><pre><span></span><code>smeli<span class="w"> </span>-h
+<span class="c1"># or</span>
+smeli<span class="w"> </span>--help
+</code></pre></div>
 <p>Run a one-shot lookup with a DOI, ORCID, arXiv/OpenAlex identifier, or free-form bibliographic query:</p>
 <div class="highlight"><pre><span></span><code>smeli<span class="w"> </span><span class="m">10</span>.1126/science.1102081
 smeli<span class="w"> </span><span class="m">0000</span>-0002-0254-6627
 smeli<span class="w"> </span>still<span class="w"> </span>building<span class="w"> </span>the<span class="w"> </span>memex<span class="w"> </span>davies
+</code></pre></div>
+<p>You can also provide fielded search terms directly from the shell:</p>
+<div class="highlight"><pre><span></span><code>smeli<span class="w"> </span>--author<span class="w"> </span><span class="s2">&quot;Stephen Davies&quot;</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Still building the memex&quot;</span><span class="w"> </span>--year<span class="w"> </span><span class="m">1995</span>
+smeli<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;Starnini&quot;</span><span class="w"> </span>-t<span class="w"> </span><span class="s2">&quot;opinion dynamics&quot;</span>
+smeli<span class="w"> </span>--identifier<span class="w"> </span><span class="m">10</span>.1126/science.1102081
+</code></pre></div>
+<p>Use <code>--list</code> with either style to force a selectable result list even when Smeli finds a single match:</p>
+<div class="highlight"><pre><span></span><code>smeli<span class="w"> </span>--list<span class="w"> </span>--author<span class="w"> </span><span class="s2">&quot;Stephen Davies&quot;</span><span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;Still building the memex&quot;</span>
 </code></pre></div>
 <p><code>smeli.cli.main()</code> is public because it is the console-script target. Python package users should usually call functions from <code>smeli.sources</code> instead.</p>
 
