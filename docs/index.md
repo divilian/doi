@@ -1,6 +1,10 @@
-# Smeli
 
-**Smeli** is the Scholarly MEtadata Lookup Interface: a DOI-aware metadata lookup library and command-line tool for scholarly papers.
+<div class="smeli-hero title">
+  <h1>Smeli</h1>
+  <img src="assets/banner.png" alt="Smeli banner">
+</div>
+
+<span class="title">**Smeli**</span> is the <span class="title">S</span>cholarly <span class="title">ME</span>tadata <span class="title">L</span>ookup <span class="title">I</span>nterface: a DOI-aware metadata lookup library and command-line tool for scholarly papers.
 
 Smeli can search and normalize metadata from OpenAlex, Crossref, DataCite, arXiv, and doi.org BibTeX content negotiation. DOI is important, but it is not required: DOI-less arXiv and OpenAlex records are valid Smeli candidates.
 

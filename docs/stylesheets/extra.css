@@ -1,0 +1,26 @@
+.smeli-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  margin: 0 0 2rem;
+}
+
+.smeli-hero h1 {
+  margin: 0;
+  font-size: 3rem;
+  white-space: nowrap;
+  color: #00a000;
+}
+
+.smeli-hero img {
+  flex: 1;
+  min-width: 0;
+  max-width: 720px;
+  height: auto;
+  border-radius: 16px;
+}
+
+.title {
+  color: #00a000;
+}

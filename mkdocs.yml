@@ -48,3 +48,6 @@ nav:
       - smeli.cli: reference/cli.md
   - CLI: cli.md
   - Development: development.md
+
+extra_css:
+  - stylesheets/extra.css
