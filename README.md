@@ -65,3 +65,10 @@ These are useful for trying the author-oriented lookup path:
 - Jennifer Doudna: `0000-0001-9161-999X`
 - Katalin Karikó: `0000-0002-1864-3851`
 - Tim Berners-Lee: `0000-0003-1279-3709`
+
+# Questions and feedback
+
+For bug reports, feature requests, or API questions, please open an issue on the
+[Smeli GitHub repository](https://github.com/divilian/smeli).
+
+For other questions, contact [Stephen Davies](https://stephendavies.org/).
